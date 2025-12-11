@@ -151,7 +151,6 @@ smart-personal-assistant/
 │   ├── api/                   # API documentation
 │   ├── deployment/            # Deployment guides
 │   ├── architecture.md
-│   └── DEVELOPMENT.md
 │
 ├── tests/                     # Test suites
 │   ├── unit/
