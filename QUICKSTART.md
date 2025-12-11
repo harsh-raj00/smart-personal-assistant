@@ -142,7 +142,7 @@ python scripts/train_health.py
 ### MongoDB connection error
 - Check MONGODB_URI in .env
 - Ensure IP whitelist includes your address
-- Try: mongodb+srv://user:password@cluster.mongodb.net/smartassistant?retryWrites=true&w=majority
+- Try: mongodb+srv://username:password@cluster.mongodb.net/smartassistant?retryWrites=true&w=majority
 
 ### Docker build fails
 ```bash
