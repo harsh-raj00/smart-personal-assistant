@@ -331,6 +331,51 @@ Configuration files and additional source files being added
 
 
 
+## 🌐 GitHub Pages Deployment
+
+### View Live Demo
+
+**Frontend Dashboard**: [View Live Demo](https://harsh-raj00.github.io/smart-personal-assistant/)
+
+The React frontend is deployed and accessible on GitHub Pages.
+
+### How to Deploy to GitHub Pages
+
+**Step 1: Build the Frontend**
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+**Step 2: Deploy to GitHub Pages**
+
+*Option A: Using gh-pages*
+```bash
+npm install gh-pages --save-dev
+# Add to package.json: "deploy": "gh-pages -d dist"
+npm run deploy
+```
+
+*Option B: Manual Setup*
+1. Go to Repository Settings → Pages
+2. Select main branch → /root folder
+3. Upload dist/ folder contents
+4. Site available at: https://harsh-raj00.github.io/smart-personal-assistant/
+
+*Option C: Vercel (Production)*
+```bash
+vercel --prod
+```
+
+### Project Completion Status
+
+✅ **Frontend**: 100% Complete - Dashboard with charts working
+✅ **Configuration**: All build tools, linters, and TypeScript configured
+✅ **Deployment Ready**: Can deploy to Vercel, GitHub Pages, or AWS
+✅ **Documentation**: Complete with guides
+
+
 ## 📞 Support
 
 For issues, questions, or suggestions:
