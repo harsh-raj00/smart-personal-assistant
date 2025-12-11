@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
+import Dashboard from './pages/Dashboard'
 
 function App() {
   return (
@@ -10,8 +11,7 @@ function App() {
         </nav>
         <main className="container mx-auto p-6">
           <Routes>
-            <Route path="/" element={<div>Welcome to Smart Personal Assistant</div>} />
-          </Routes>
+            <Route path="/" element={<Dashboard />} />
         </main>
       </div>
     </Router>
