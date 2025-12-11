@@ -1,0 +1,130 @@
+version: '3.9'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: smart-assistant-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: smart-assistant
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - smart-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Gateway API
+  backend-gateway:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.backend
+    container_name: smart-assistant-api-gateway
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      API_PORT: 3001
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/smart-assistant?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      CORS_ORIGINS: http://localhost:3000,http://localhost:3001
+      FINANCE_SERVICE_URL: http://finance-service:3002
+      HEALTH_SERVICE_URL: http://health-service:3003
+      ML_SERVICE_URL: http://ml-service:5000
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - smart-network
+    healthcheck:
+      test: curl --fail http://localhost:3001/health || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Finance Service
+  finance-service:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.finance-service
+    container_name: smart-assistant-finance-service
+    ports:
+      - "3002:3002"
+    environment:
+      NODE_ENV: development
+      SERVICE_PORT: 3002
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/smart-assistant?authSource=admin
+      ML_SERVICE_URL: http://ml-service:5000/api/finance
+    depends_on:
+      - mongodb
+    networks:
+      - smart-network
+
+  # Health Service
+  health-service:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.health-service
+    container_name: smart-assistant-health-service
+    ports:
+      - "3003:3003"
+    environment:
+      NODE_ENV: development
+      SERVICE_PORT: 3003
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/smart-assistant?authSource=admin
+      ML_SERVICE_URL: http://ml-service:5000/api/health
+    depends_on:
+      - mongodb
+    networks:
+      - smart-network
+
+  # ML Inference Service
+  ml-service:
+    build:
+      context: ./ml
+      dockerfile: ../infra/docker/Dockerfile.ml-service
+    container_name: smart-assistant-ml-service
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: development
+      FLASK_APP: api.py
+    volumes:
+      - ./ml/models:/app/models
+      - ./ml/scripts:/app/scripts
+    networks:
+      - smart-network
+    healthcheck:
+      test: curl --fail http://localhost:5000/health || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: smart-assistant-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - smart-network
+    healthcheck:
+      test: redis-cli ping
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  smart-network:
+    driver: bridge
