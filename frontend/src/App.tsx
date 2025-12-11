@@ -12,10 +12,9 @@ function App() {
         <main className="container mx-auto p-6">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-        </main>
-      </div>
-    </Router>
-  )
-}
+            </Routes>
+            </main>
+            </div>
+        </Router>
 
 export default App
